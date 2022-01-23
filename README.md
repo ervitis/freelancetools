@@ -2,10 +2,18 @@
 
 For automating processes
 
+## Installing
+
+Generate swagger client
+
+```bash
+ swagger generate client
+```
+
 ## List of features
 
-- Get working hours from google calendar events
-- TBD
+- Get working hours from Google calendar events
+- Get the latest exchange rate of a currency
 
 ## List of TODO
 
