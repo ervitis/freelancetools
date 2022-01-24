@@ -20,3 +20,4 @@ Generate swagger client
 - Better logging
 - Manage errors and wrap them
 - Refactor using services
+- Idempotence and transactional
