@@ -1,6 +1,10 @@
 # Freelance tools
 
-For automating processes
+For automating processes using following products:
+
+- Google Drive to create invoices
+- Google Calendar to retrieve schedule work
+- fixer.io exchange api for exchange rates
 
 ## Installing
 
