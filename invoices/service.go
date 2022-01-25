@@ -7,6 +7,7 @@ import (
 	"github.com/ervitis/freelancetools/common"
 	"github.com/ervitis/freelancetools/credentials"
 	"github.com/ervitis/freelancetools/workinghours"
+	"github.com/ervitis/gotransactions"
 	"google.golang.org/api/drive/v3"
 	"google.golang.org/api/option"
 	"google.golang.org/api/sheets/v4"
@@ -153,13 +154,26 @@ func (i *invoices) CreateNewInvoice(workHoursData workinghours.WorkingData) erro
 			return fmt.Errorf("sheetService get spreadshet by id %s: %w", copiedFile.Id, err)
 		}
 
-		_, err = i.sheetService.Spreadsheets.Values.BatchUpdate(invoice.SpreadsheetId, &sheets.BatchUpdateValuesRequest{
-			Data:             valueRange,
-			ValueInputOption: "RAW",
-		}).Do()
-		if err != nil {
-			return fmt.Errorf("batch update sheetService error: %w", err)
+		onTransactionCopy := gotransactions.OnTransaction(func() error {
+			_, err = i.sheetService.Spreadsheets.Values.BatchUpdate(invoice.SpreadsheetId, &sheets.BatchUpdateValuesRequest{
+				Data:             valueRange,
+				ValueInputOption: "RAW",
+			}).Do()
+			if err != nil {
+				return fmt.Errorf("batch update sheetService error: %w", err)
+			}
+			return nil
+		})
+
+		onRollback := gotransactions.OnRollback(func() error {
+			_ = i.driveService.Files.Delete(copiedFile.Id).Do()
+			return nil
+		})
+
+		if err := gotransactions.New(onTransactionCopy, onRollback).ExecuteTransaction(); err != nil {
+			return err
 		}
+
 	}
 
 	return nil
