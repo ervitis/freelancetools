@@ -23,6 +23,4 @@ Generate swagger client
 ## List of TODO
 
 - Better logging
-- Manage errors and wrap them
-- Refactor using services
 - Idempotence and transactional
