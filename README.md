@@ -23,4 +23,4 @@ Generate swagger client
 ## List of TODO
 
 - Better logging
-- Idempotence and transactional
+- Automate get code from google using scrapper if possible
