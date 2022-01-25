@@ -18,6 +18,7 @@ Generate swagger client
 
 - Get working hours from Google calendar events
 - Get the latest exchange rate of a currency
+- Generate spreadsheet invoice
 
 ## List of TODO
 
