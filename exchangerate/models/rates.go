@@ -8,6 +8,7 @@ package models
 import (
 	"context"
 
+	"github.com/go-openapi/errors"
 	"github.com/go-openapi/strfmt"
 	"github.com/go-openapi/swag"
 )
@@ -17,23 +18,73 @@ import (
 // swagger:model Rates
 type Rates struct {
 
-	// base
-	Base string `json:"base,omitempty"`
+	// data
+	Data map[string]float64 `json:"data,omitempty"`
 
-	// date
-	Date string `json:"date,omitempty"`
-
-	// rates
-	Rates map[string]float64 `json:"rates,omitempty"`
+	// query
+	Query *RatesQuery `json:"query,omitempty"`
 }
 
 // Validate validates this rates
 func (m *Rates) Validate(formats strfmt.Registry) error {
+	var res []error
+
+	if err := m.validateQuery(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if len(res) > 0 {
+		return errors.CompositeValidationError(res...)
+	}
 	return nil
 }
 
-// ContextValidate validates this rates based on context it is used
+func (m *Rates) validateQuery(formats strfmt.Registry) error {
+	if swag.IsZero(m.Query) { // not required
+		return nil
+	}
+
+	if m.Query != nil {
+		if err := m.Query.Validate(formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("query")
+			} else if ce, ok := err.(*errors.CompositeError); ok {
+				return ce.ValidateName("query")
+			}
+			return err
+		}
+	}
+
+	return nil
+}
+
+// ContextValidate validate this rates based on the context it is used
 func (m *Rates) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
+	var res []error
+
+	if err := m.contextValidateQuery(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
+	if len(res) > 0 {
+		return errors.CompositeValidationError(res...)
+	}
+	return nil
+}
+
+func (m *Rates) contextValidateQuery(ctx context.Context, formats strfmt.Registry) error {
+
+	if m.Query != nil {
+		if err := m.Query.ContextValidate(ctx, formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("query")
+			} else if ce, ok := err.(*errors.CompositeError); ok {
+				return ce.ValidateName("query")
+			}
+			return err
+		}
+	}
+
 	return nil
 }
 
@@ -48,6 +99,46 @@ func (m *Rates) MarshalBinary() ([]byte, error) {
 // UnmarshalBinary interface implementation
 func (m *Rates) UnmarshalBinary(b []byte) error {
 	var res Rates
+	if err := swag.ReadJSON(b, &res); err != nil {
+		return err
+	}
+	*m = res
+	return nil
+}
+
+// RatesQuery rates query
+//
+// swagger:model RatesQuery
+type RatesQuery struct {
+
+	// base currency
+	BaseCurrency string `json:"base_currency,omitempty"`
+
+	// timestamp
+	Timestamp float64 `json:"timestamp,omitempty"`
+}
+
+// Validate validates this rates query
+func (m *RatesQuery) Validate(formats strfmt.Registry) error {
+	return nil
+}
+
+// ContextValidate validates this rates query based on context it is used
+func (m *RatesQuery) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
+	return nil
+}
+
+// MarshalBinary interface implementation
+func (m *RatesQuery) MarshalBinary() ([]byte, error) {
+	if m == nil {
+		return nil, nil
+	}
+	return swag.WriteJSON(m)
+}
+
+// UnmarshalBinary interface implementation
+func (m *RatesQuery) UnmarshalBinary(b []byte) error {
+	var res RatesQuery
 	if err := swag.ReadJSON(b, &res); err != nil {
 		return err
 	}

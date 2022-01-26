@@ -11,32 +11,31 @@ import (
 	"github.com/go-openapi/strfmt"
 
 	"github.com/ervitis/freelancetools/exchangerate/client/rates"
-	"github.com/ervitis/freelancetools/exchangerate/client/symbols"
 )
 
-// Default fixer io HTTP client.
+// Default freecurrency API HTTP client.
 var Default = NewHTTPClient(nil)
 
 const (
 	// DefaultHost is the default Host
 	// found in Meta (info) section of spec file
-	DefaultHost string = "data.fixer.io"
+	DefaultHost string = "freecurrencyapi.net"
 	// DefaultBasePath is the default BasePath
 	// found in Meta (info) section of spec file
-	DefaultBasePath string = "/api/"
+	DefaultBasePath string = "/api/v2"
 )
 
 // DefaultSchemes are the default schemes found in Meta (info) section of spec file
-var DefaultSchemes = []string{"http"}
+var DefaultSchemes = []string{"https"}
 
-// NewHTTPClient creates a new fixer io HTTP client.
-func NewHTTPClient(formats strfmt.Registry) *FixerIo {
+// NewHTTPClient creates a new freecurrency API HTTP client.
+func NewHTTPClient(formats strfmt.Registry) *FreecurrencyAPI {
 	return NewHTTPClientWithConfig(formats, nil)
 }
 
-// NewHTTPClientWithConfig creates a new fixer io HTTP client,
+// NewHTTPClientWithConfig creates a new freecurrency API HTTP client,
 // using a customizable transport config.
-func NewHTTPClientWithConfig(formats strfmt.Registry, cfg *TransportConfig) *FixerIo {
+func NewHTTPClientWithConfig(formats strfmt.Registry, cfg *TransportConfig) *FreecurrencyAPI {
 	// ensure nullable parameters have default
 	if cfg == nil {
 		cfg = DefaultTransportConfig()
@@ -47,17 +46,16 @@ func NewHTTPClientWithConfig(formats strfmt.Registry, cfg *TransportConfig) *Fix
 	return New(transport, formats)
 }
 
-// New creates a new fixer io client
-func New(transport runtime.ClientTransport, formats strfmt.Registry) *FixerIo {
+// New creates a new freecurrency API client
+func New(transport runtime.ClientTransport, formats strfmt.Registry) *FreecurrencyAPI {
 	// ensure nullable parameters have default
 	if formats == nil {
 		formats = strfmt.Default
 	}
 
-	cli := new(FixerIo)
+	cli := new(FreecurrencyAPI)
 	cli.Transport = transport
 	cli.Rates = rates.New(transport, formats)
-	cli.Symbols = symbols.New(transport, formats)
 	return cli
 }
 
@@ -100,18 +98,15 @@ func (cfg *TransportConfig) WithSchemes(schemes []string) *TransportConfig {
 	return cfg
 }
 
-// FixerIo is a client for fixer io
-type FixerIo struct {
+// FreecurrencyAPI is a client for freecurrency API
+type FreecurrencyAPI struct {
 	Rates rates.ClientService
-
-	Symbols symbols.ClientService
 
 	Transport runtime.ClientTransport
 }
 
 // SetTransport changes the transport on the client and all its subresources
-func (c *FixerIo) SetTransport(transport runtime.ClientTransport) {
+func (c *FreecurrencyAPI) SetTransport(transport runtime.ClientTransport) {
 	c.Transport = transport
 	c.Rates.SetTransport(transport)
-	c.Symbols.SetTransport(transport)
 }

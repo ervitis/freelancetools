@@ -1,32 +1,59 @@
 swagger: '2.0'
 info:
-  title: Fixer.io
-  description: Foreign Exchange Rates and Currency Conversion API fixer.io
+  title: freecurrencyApi
+  description: Foreign Exchange Rates and Currency Conversion API freecurrencyApi
   version: '1.0'
-host: 'data.fixer.io'
-basePath: '/api/'
+host: 'freecurrencyapi.net'
+basePath: '/api/v2'
 schemes:
-  - http
+  - https
 produces:
   - application/json
 paths:
-  /symbols:
+  /historical:
     get:
-      summary: Get currencies symbols
-      operationId: getSymbols
+      summary: Convert from currency to another historically
+      operationId: historical
       tags:
-        - Symbols
+        - Rates
       parameters:
-        - name: access_key
-          required: true
-          description: API Key
-          type: string
+        - name: date_from
           in: query
+          description: The currency from conversion
+          type: string
+          required: false
+        - name: date_to
+          in: query
+          description: The currency to convert
+          type: string
+          required: false
+        - name: base_currency
+          in: query
+          description: Amount
+          type: number
+          required: false
+        - name: apikey
+          in: query
+          description: Access API key
+          type: string
+          required: true
       responses:
         200:
-          description: Retrieved currencies symbols
+          description: The foreign exchange reference rates
           schema:
-            $ref: '#/definitions/Symbols'
+            $ref: '#/definitions/Rates'
+        404:
+          description: The requested resource does not exist
+          schema:
+            $ref: '#/definitions/Error'
+        429:
+          description: Rate limit
+          schema:
+            $ref: '#/definitions/Error'
+        500:
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/Error'
   /latest:
     get:
       summary: Get the latest foreign exchange reference rates
@@ -35,21 +62,13 @@ paths:
       tags:
         - Rates
       parameters:
-        - name: base
+        - name: base_currency
           in: query
           description: The base currency
           type: string
           required: false
           default: EUR
-        - name: symbols
-          in: query
-          description: The exchange rates symbols returned
-          type: array
-          items:
-            type: string
-          collectionFormat: csv
-          required: false
-        - name: access_key
+        - name: apikey
           in: query
           description: Access API key
           type: string
@@ -63,151 +82,31 @@ paths:
           description: The requested resource does not exist
           schema:
             $ref: '#/definitions/Error'
-        101:
-          description: No API Key was specified or an invalid API Key was specified.
+        429:
+          description: Rate limit
           schema:
             $ref: '#/definitions/Error'
-        103:
-          description: The requested API endpoint does not exist.
+        500:
+          description: Internal Server Error
           schema:
             $ref: '#/definitions/Error'
-        104:
-          description: The maximum allowed API amount of monthly API requests has been reached.
-          schema:
-            $ref: '#/definitions/Error'
-        105:
-          description: The current subscription plan does not support this API endpoint.
-          schema:
-            $ref: '#/definitions/Error'
-        106:
-          description: The current request did not return any results.
-          schema:
-            $ref: '#/definitions/Error'
-        102:
-          description: The account this API request is coming from is inactive.
-          schema:
-            $ref: '#/definitions/Error'
-        201:
-          description: An invalid base currency has been entered.
-          schema:
-            $ref: '#/definitions/Error'
-        202:
-          description: One or more invalid symbols have been specified.
-          schema:
-            $ref: '#/definitions/Error'
-        302:
-          description: An invalid date has been specified. [historical, convert]
-          schema:
-            $ref: '#/definitions/Error'
-        403:
-          description: No or an invalid amount has been specified. [convert]
-          schema:
-            $ref: '#/definitions/Error'
-  /{date}:
-    get:
-      summary: Get historical rates from a gived date
-      description: Returns the foreign exchange reference rates for an historical date. Rates are quoted against the Euro by default. Specify the symbols returned (default = all)
-      operationId: getByDate
-      tags:
-        - Rates
-      parameters:
-        - name: date
-          in: path
-          description: The given date
-          type: string
-          format: date
-          required: true
-        - name: base
-          in: query
-          description: The base currency
-          type: string
-          required: false
-          default: EUR
-        - name: symbols
-          in: query
-          description: The exchange rates symbols returned
-          type: array
-          items:
-            type: string
-          collectionFormat: csv
-          required: false
-        - name: access_key
-          in: query
-          description: Access API key
-          type: string
-          required: true
-      responses:
-        200:
-          description: The foreign exchange reference rates
-          schema:
-            $ref: '#/definitions/Rates'
-        404:
-          description: The requested resource does not exist
-          schema:
-            $ref: '#/definitions/Error'
-        101:
-          description: No API Key was specified or an invalid API Key was specified.
-          schema:
-            $ref: '#/definitions/Error'
-        103:
-          description: The requested API endpoint does not exist.
-          schema:
-            $ref: '#/definitions/Error'
-        104:
-          description: The maximum allowed API amount of monthly API requests has been reached.
-          schema:
-            $ref: '#/definitions/Error'
-        105:
-          description: The current subscription plan does not support this API endpoint.
-          schema:
-            $ref: '#/definitions/Error'
-        106:
-          description: The current request did not return any results.
-          schema:
-            $ref: '#/definitions/Error'
-        102:
-          description: The account this API request is coming from is inactive.
-          schema:
-            $ref: '#/definitions/Error'
-        201:
-          description: An invalid base currency has been entered.
-          schema:
-            $ref: '#/definitions/Error'
-        202:
-          description: One or more invalid symbols have been specified.
-          schema:
-            $ref: '#/definitions/Error'
-        302:
-          description: An invalid date has been specified. [historical, convert]
-          schema:
-            $ref: '#/definitions/Error'
-        403:
-          description: No or an invalid amount has been specified. [convert]
-          schema:
-            $ref: '#/definitions/Error'
+
 definitions:
   Rates:
     type: object
     properties:
-      base:
-        type: string
-      date:
-        type: string
-        format: string
-      rates:
+      query:
+        type: object
+        properties:
+          base_currency:
+            type: string
+          timestamp:
+            type: number
+      data:
         type: object
         additionalProperties:
           type: number
-          format: double
-  Symbols:
-    type: object
-    properties:
-      success:
-        type: boolean
-      symbols:
-        type: object
-        additionalProperties:
-          type: string
+
   Error:
     type: object
     properties:

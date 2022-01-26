@@ -14,7 +14,6 @@ import (
 	"github.com/go-openapi/runtime"
 	cr "github.com/go-openapi/runtime/client"
 	"github.com/go-openapi/strfmt"
-	"github.com/go-openapi/swag"
 )
 
 // NewGetLatestParams creates a new GetLatestParams object,
@@ -60,25 +59,19 @@ func NewGetLatestParamsWithHTTPClient(client *http.Client) *GetLatestParams {
 */
 type GetLatestParams struct {
 
-	/* AccessKey.
+	/* Apikey.
 
 	   Access API key
 	*/
-	AccessKey string
+	Apikey string
 
-	/* Base.
+	/* BaseCurrency.
 
 	   The base currency
 
 	   Default: "EUR"
 	*/
-	Base *string
-
-	/* Symbols.
-
-	   The exchange rates symbols returned
-	*/
-	Symbols []string
+	BaseCurrency *string
 
 	timeout    time.Duration
 	Context    context.Context
@@ -98,11 +91,11 @@ func (o *GetLatestParams) WithDefaults() *GetLatestParams {
 // All values with no default are reset to their zero value.
 func (o *GetLatestParams) SetDefaults() {
 	var (
-		baseDefault = string("EUR")
+		baseCurrencyDefault = string("EUR")
 	)
 
 	val := GetLatestParams{
-		Base: &baseDefault,
+		BaseCurrency: &baseCurrencyDefault,
 	}
 
 	val.timeout = o.timeout
@@ -144,37 +137,26 @@ func (o *GetLatestParams) SetHTTPClient(client *http.Client) {
 	o.HTTPClient = client
 }
 
-// WithAccessKey adds the accessKey to the get latest params
-func (o *GetLatestParams) WithAccessKey(accessKey string) *GetLatestParams {
-	o.SetAccessKey(accessKey)
+// WithApikey adds the apikey to the get latest params
+func (o *GetLatestParams) WithApikey(apikey string) *GetLatestParams {
+	o.SetApikey(apikey)
 	return o
 }
 
-// SetAccessKey adds the accessKey to the get latest params
-func (o *GetLatestParams) SetAccessKey(accessKey string) {
-	o.AccessKey = accessKey
+// SetApikey adds the apikey to the get latest params
+func (o *GetLatestParams) SetApikey(apikey string) {
+	o.Apikey = apikey
 }
 
-// WithBase adds the base to the get latest params
-func (o *GetLatestParams) WithBase(base *string) *GetLatestParams {
-	o.SetBase(base)
+// WithBaseCurrency adds the baseCurrency to the get latest params
+func (o *GetLatestParams) WithBaseCurrency(baseCurrency *string) *GetLatestParams {
+	o.SetBaseCurrency(baseCurrency)
 	return o
 }
 
-// SetBase adds the base to the get latest params
-func (o *GetLatestParams) SetBase(base *string) {
-	o.Base = base
-}
-
-// WithSymbols adds the symbols to the get latest params
-func (o *GetLatestParams) WithSymbols(symbols []string) *GetLatestParams {
-	o.SetSymbols(symbols)
-	return o
-}
-
-// SetSymbols adds the symbols to the get latest params
-func (o *GetLatestParams) SetSymbols(symbols []string) {
-	o.Symbols = symbols
+// SetBaseCurrency adds the baseCurrency to the get latest params
+func (o *GetLatestParams) SetBaseCurrency(baseCurrency *string) {
+	o.BaseCurrency = baseCurrency
 }
 
 // WriteToRequest writes these params to a swagger request
@@ -185,41 +167,30 @@ func (o *GetLatestParams) WriteToRequest(r runtime.ClientRequest, reg strfmt.Reg
 	}
 	var res []error
 
-	// query param access_key
-	qrAccessKey := o.AccessKey
-	qAccessKey := qrAccessKey
-	if qAccessKey != "" {
+	// query param apikey
+	qrApikey := o.Apikey
+	qApikey := qrApikey
+	if qApikey != "" {
 
-		if err := r.SetQueryParam("access_key", qAccessKey); err != nil {
+		if err := r.SetQueryParam("apikey", qApikey); err != nil {
 			return err
 		}
 	}
 
-	if o.Base != nil {
+	if o.BaseCurrency != nil {
 
-		// query param base
-		var qrBase string
+		// query param base_currency
+		var qrBaseCurrency string
 
-		if o.Base != nil {
-			qrBase = *o.Base
+		if o.BaseCurrency != nil {
+			qrBaseCurrency = *o.BaseCurrency
 		}
-		qBase := qrBase
-		if qBase != "" {
+		qBaseCurrency := qrBaseCurrency
+		if qBaseCurrency != "" {
 
-			if err := r.SetQueryParam("base", qBase); err != nil {
+			if err := r.SetQueryParam("base_currency", qBaseCurrency); err != nil {
 				return err
 			}
-		}
-	}
-
-	if o.Symbols != nil {
-
-		// binding items for symbols
-		joinedSymbols := o.bindParamSymbols(reg)
-
-		// query array param symbols
-		if err := r.SetQueryParam("symbols", joinedSymbols...); err != nil {
-			return err
 		}
 	}
 
@@ -227,21 +198,4 @@ func (o *GetLatestParams) WriteToRequest(r runtime.ClientRequest, reg strfmt.Reg
 		return errors.CompositeValidationError(res...)
 	}
 	return nil
-}
-
-// bindParamGetLatest binds the parameter symbols
-func (o *GetLatestParams) bindParamSymbols(formats strfmt.Registry) []string {
-	symbolsIR := o.Symbols
-
-	var symbolsIC []string
-	for _, symbolsIIR := range symbolsIR { // explode []string
-
-		symbolsIIV := symbolsIIR // string as string
-		symbolsIC = append(symbolsIC, symbolsIIV)
-	}
-
-	// items.CollectionFormat: "csv"
-	symbolsIS := swag.JoinByFormat(symbolsIC, "csv")
-
-	return symbolsIS
 }

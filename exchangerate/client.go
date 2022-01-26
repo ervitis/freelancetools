@@ -6,7 +6,6 @@ import (
 	"github.com/ervitis/freelancetools/config"
 	"github.com/ervitis/freelancetools/exchangerate/client"
 	"github.com/ervitis/freelancetools/exchangerate/client/rates"
-	"github.com/ervitis/freelancetools/exchangerate/client/symbols"
 	"github.com/go-openapi/strfmt"
 	"time"
 )
@@ -15,7 +14,7 @@ type (
 	ExchangeApi struct {
 		URL        string
 		APIKEY     string
-		client     *client.FixerIo
+		client     *client.FreecurrencyAPI
 		currencies []string
 	}
 
@@ -53,18 +52,14 @@ func (eapi *ExchangeApi) getCurrencies() error {
 	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
 	defer cancel()
 
-	resp, err := eapi.client.Symbols.GetSymbols(&symbols.GetSymbolsParams{AccessKey: eapi.APIKEY, Context: ctx})
+	resp, err := eapi.client.Rates.GetLatest(&rates.GetLatestParams{Apikey: eapi.APIKEY, Context: ctx})
 	if err != nil {
 		return fmt.Errorf("error when trying to retrieve symbols: %w", err)
 	}
 
-	if !resp.Payload.Success {
-		return fmt.Errorf("error doing request: %s", resp.Error())
-	}
-
 	eapi.currencies = make([]string, 0)
-	for v := range resp.GetPayload().Symbols {
-		eapi.currencies = append(eapi.currencies, v)
+	for v := range resp.GetPayload().Data {
+		eapi.currencies = append(eapi.currencies, fmt.Sprintf("%v", v))
 	}
 	return nil
 }
@@ -97,13 +92,20 @@ func (eapi *ExchangeApi) ConvertCurrencyLatest(from string, to string, quantity 
 	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
 	defer cancel()
 
-	resp, _, _, err := eapi.client.Rates.GetLatest(&rates.GetLatestParams{AccessKey: eapi.APIKEY, Base: &from, Symbols: []string{to}, Context: ctx})
+	resp, err := eapi.client.Rates.GetLatest(&rates.GetLatestParams{
+		Apikey: eapi.APIKEY, BaseCurrency: &from, Context: ctx,
+	})
 	if err != nil {
 		return nil, fmt.Errorf("convertCurrency: error doing request: %w", err)
 	}
 
+	q, ok := resp.GetPayload().Data[to]
+	if !ok {
+		q = 0.0
+	}
+
 	return &ConvertedCurrency{
 		Currency: to,
-		Value:    resp.GetPayload().Rates[to] * quantity,
+		Value:    q,
 	}, nil
 }

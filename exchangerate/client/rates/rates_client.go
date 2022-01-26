@@ -30,54 +30,11 @@ type ClientOption func(*runtime.ClientOperation)
 
 // ClientService is the interface for Client methods
 type ClientService interface {
-	GetByDate(params *GetByDateParams, opts ...ClientOption) (*GetByDateOK, *GetByDateCreated, *GetByDateAccepted, error)
+	GetLatest(params *GetLatestParams, opts ...ClientOption) (*GetLatestOK, error)
 
-	GetLatest(params *GetLatestParams, opts ...ClientOption) (*GetLatestOK, *GetLatestCreated, *GetLatestAccepted, error)
+	Historical(params *HistoricalParams, opts ...ClientOption) (*HistoricalOK, error)
 
 	SetTransport(transport runtime.ClientTransport)
-}
-
-/*
-  GetByDate gets historical rates from a gived date
-
-  Returns the foreign exchange reference rates for an historical date. Rates are quoted against the Euro by default. Specify the symbols returned (default = all)
-*/
-func (a *Client) GetByDate(params *GetByDateParams, opts ...ClientOption) (*GetByDateOK, *GetByDateCreated, *GetByDateAccepted, error) {
-	// TODO: Validate the params before sending
-	if params == nil {
-		params = NewGetByDateParams()
-	}
-	op := &runtime.ClientOperation{
-		ID:                 "getByDate",
-		Method:             "GET",
-		PathPattern:        "/{date}",
-		ProducesMediaTypes: []string{"application/json"},
-		ConsumesMediaTypes: []string{"application/json"},
-		Schemes:            []string{"http"},
-		Params:             params,
-		Reader:             &GetByDateReader{formats: a.formats},
-		Context:            params.Context,
-		Client:             params.HTTPClient,
-	}
-	for _, opt := range opts {
-		opt(op)
-	}
-
-	result, err := a.transport.Submit(op)
-	if err != nil {
-		return nil, nil, nil, err
-	}
-	switch value := result.(type) {
-	case *GetByDateOK:
-		return value, nil, nil, nil
-	case *GetByDateCreated:
-		return nil, value, nil, nil
-	case *GetByDateAccepted:
-		return nil, nil, value, nil
-	}
-	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
-	msg := fmt.Sprintf("unexpected success response for rates: API contract not enforced by server. Client expected to get an error, but got: %T", result)
-	panic(msg)
 }
 
 /*
@@ -85,7 +42,7 @@ func (a *Client) GetByDate(params *GetByDateParams, opts ...ClientOption) (*GetB
 
   Returns the latest foreign exchange reference rates. Rates are quoted against the Euro by default. Specify the symbols returned (default = all)
 */
-func (a *Client) GetLatest(params *GetLatestParams, opts ...ClientOption) (*GetLatestOK, *GetLatestCreated, *GetLatestAccepted, error) {
+func (a *Client) GetLatest(params *GetLatestParams, opts ...ClientOption) (*GetLatestOK, error) {
 	// TODO: Validate the params before sending
 	if params == nil {
 		params = NewGetLatestParams()
@@ -96,7 +53,7 @@ func (a *Client) GetLatest(params *GetLatestParams, opts ...ClientOption) (*GetL
 		PathPattern:        "/latest",
 		ProducesMediaTypes: []string{"application/json"},
 		ConsumesMediaTypes: []string{"application/json"},
-		Schemes:            []string{"http"},
+		Schemes:            []string{"https"},
 		Params:             params,
 		Reader:             &GetLatestReader{formats: a.formats},
 		Context:            params.Context,
@@ -108,18 +65,53 @@ func (a *Client) GetLatest(params *GetLatestParams, opts ...ClientOption) (*GetL
 
 	result, err := a.transport.Submit(op)
 	if err != nil {
-		return nil, nil, nil, err
+		return nil, err
 	}
-	switch value := result.(type) {
-	case *GetLatestOK:
-		return value, nil, nil, nil
-	case *GetLatestCreated:
-		return nil, value, nil, nil
-	case *GetLatestAccepted:
-		return nil, nil, value, nil
+	success, ok := result.(*GetLatestOK)
+	if ok {
+		return success, nil
 	}
+	// unexpected success response
 	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
-	msg := fmt.Sprintf("unexpected success response for rates: API contract not enforced by server. Client expected to get an error, but got: %T", result)
+	msg := fmt.Sprintf("unexpected success response for getLatest: API contract not enforced by server. Client expected to get an error, but got: %T", result)
+	panic(msg)
+}
+
+/*
+  Historical converts from currency to another historically
+*/
+func (a *Client) Historical(params *HistoricalParams, opts ...ClientOption) (*HistoricalOK, error) {
+	// TODO: Validate the params before sending
+	if params == nil {
+		params = NewHistoricalParams()
+	}
+	op := &runtime.ClientOperation{
+		ID:                 "historical",
+		Method:             "GET",
+		PathPattern:        "/historical",
+		ProducesMediaTypes: []string{"application/json"},
+		ConsumesMediaTypes: []string{"application/json"},
+		Schemes:            []string{"https"},
+		Params:             params,
+		Reader:             &HistoricalReader{formats: a.formats},
+		Context:            params.Context,
+		Client:             params.HTTPClient,
+	}
+	for _, opt := range opts {
+		opt(op)
+	}
+
+	result, err := a.transport.Submit(op)
+	if err != nil {
+		return nil, err
+	}
+	success, ok := result.(*HistoricalOK)
+	if ok {
+		return success, nil
+	}
+	// unexpected success response
+	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
+	msg := fmt.Sprintf("unexpected success response for historical: API contract not enforced by server. Client expected to get an error, but got: %T", result)
 	panic(msg)
 }
 

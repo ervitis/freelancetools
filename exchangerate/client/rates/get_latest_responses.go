@@ -23,74 +23,26 @@ type GetLatestReader struct {
 // ReadResponse reads a server response into the received o.
 func (o *GetLatestReader) ReadResponse(response runtime.ClientResponse, consumer runtime.Consumer) (interface{}, error) {
 	switch response.Code() {
-	case 101:
-		result := NewGetLatestSwitchingProtocols()
-		if err := result.readResponse(response, consumer, o.formats); err != nil {
-			return nil, err
-		}
-		return nil, result
-	case 102:
-		result := NewGetLatestProcessing()
-		if err := result.readResponse(response, consumer, o.formats); err != nil {
-			return nil, err
-		}
-		return nil, result
-	case 103:
-		result := NewGetLatestCheckpoint()
-		if err := result.readResponse(response, consumer, o.formats); err != nil {
-			return nil, err
-		}
-		return nil, result
-	case 104:
-		result := NewGetLatestStatus104()
-		if err := result.readResponse(response, consumer, o.formats); err != nil {
-			return nil, err
-		}
-		return nil, result
-	case 105:
-		result := NewGetLatestStatus105()
-		if err := result.readResponse(response, consumer, o.formats); err != nil {
-			return nil, err
-		}
-		return nil, result
-	case 106:
-		result := NewGetLatestStatus106()
-		if err := result.readResponse(response, consumer, o.formats); err != nil {
-			return nil, err
-		}
-		return nil, result
 	case 200:
 		result := NewGetLatestOK()
 		if err := result.readResponse(response, consumer, o.formats); err != nil {
 			return nil, err
 		}
 		return result, nil
-	case 201:
-		result := NewGetLatestCreated()
-		if err := result.readResponse(response, consumer, o.formats); err != nil {
-			return nil, err
-		}
-		return result, nil
-	case 202:
-		result := NewGetLatestAccepted()
-		if err := result.readResponse(response, consumer, o.formats); err != nil {
-			return nil, err
-		}
-		return result, nil
-	case 302:
-		result := NewGetLatestFound()
-		if err := result.readResponse(response, consumer, o.formats); err != nil {
-			return nil, err
-		}
-		return nil, result
-	case 403:
-		result := NewGetLatestForbidden()
-		if err := result.readResponse(response, consumer, o.formats); err != nil {
-			return nil, err
-		}
-		return nil, result
 	case 404:
 		result := NewGetLatestNotFound()
+		if err := result.readResponse(response, consumer, o.formats); err != nil {
+			return nil, err
+		}
+		return nil, result
+	case 429:
+		result := NewGetLatestTooManyRequests()
+		if err := result.readResponse(response, consumer, o.formats); err != nil {
+			return nil, err
+		}
+		return nil, result
+	case 500:
+		result := NewGetLatestInternalServerError()
 		if err := result.readResponse(response, consumer, o.formats); err != nil {
 			return nil, err
 		}
@@ -98,198 +50,6 @@ func (o *GetLatestReader) ReadResponse(response runtime.ClientResponse, consumer
 	default:
 		return nil, runtime.NewAPIError("response status code does not match any response statuses defined for this endpoint in the swagger spec", response, response.Code())
 	}
-}
-
-// NewGetLatestSwitchingProtocols creates a GetLatestSwitchingProtocols with default headers values
-func NewGetLatestSwitchingProtocols() *GetLatestSwitchingProtocols {
-	return &GetLatestSwitchingProtocols{}
-}
-
-/* GetLatestSwitchingProtocols describes a response with status code 101, with default header values.
-
-No API Key was specified or an invalid API Key was specified.
-*/
-type GetLatestSwitchingProtocols struct {
-	Payload *models.Error
-}
-
-func (o *GetLatestSwitchingProtocols) Error() string {
-	return fmt.Sprintf("[GET /latest][%d] getLatestSwitchingProtocols  %+v", 101, o.Payload)
-}
-func (o *GetLatestSwitchingProtocols) GetPayload() *models.Error {
-	return o.Payload
-}
-
-func (o *GetLatestSwitchingProtocols) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
-
-	o.Payload = new(models.Error)
-
-	// response payload
-	if err := consumer.Consume(response.Body(), o.Payload); err != nil && err != io.EOF {
-		return err
-	}
-
-	return nil
-}
-
-// NewGetLatestProcessing creates a GetLatestProcessing with default headers values
-func NewGetLatestProcessing() *GetLatestProcessing {
-	return &GetLatestProcessing{}
-}
-
-/* GetLatestProcessing describes a response with status code 102, with default header values.
-
-The account this API request is coming from is inactive.
-*/
-type GetLatestProcessing struct {
-	Payload *models.Error
-}
-
-func (o *GetLatestProcessing) Error() string {
-	return fmt.Sprintf("[GET /latest][%d] getLatestProcessing  %+v", 102, o.Payload)
-}
-func (o *GetLatestProcessing) GetPayload() *models.Error {
-	return o.Payload
-}
-
-func (o *GetLatestProcessing) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
-
-	o.Payload = new(models.Error)
-
-	// response payload
-	if err := consumer.Consume(response.Body(), o.Payload); err != nil && err != io.EOF {
-		return err
-	}
-
-	return nil
-}
-
-// NewGetLatestCheckpoint creates a GetLatestCheckpoint with default headers values
-func NewGetLatestCheckpoint() *GetLatestCheckpoint {
-	return &GetLatestCheckpoint{}
-}
-
-/* GetLatestCheckpoint describes a response with status code 103, with default header values.
-
-The requested API endpoint does not exist.
-*/
-type GetLatestCheckpoint struct {
-	Payload *models.Error
-}
-
-func (o *GetLatestCheckpoint) Error() string {
-	return fmt.Sprintf("[GET /latest][%d] getLatestCheckpoint  %+v", 103, o.Payload)
-}
-func (o *GetLatestCheckpoint) GetPayload() *models.Error {
-	return o.Payload
-}
-
-func (o *GetLatestCheckpoint) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
-
-	o.Payload = new(models.Error)
-
-	// response payload
-	if err := consumer.Consume(response.Body(), o.Payload); err != nil && err != io.EOF {
-		return err
-	}
-
-	return nil
-}
-
-// NewGetLatestStatus104 creates a GetLatestStatus104 with default headers values
-func NewGetLatestStatus104() *GetLatestStatus104 {
-	return &GetLatestStatus104{}
-}
-
-/* GetLatestStatus104 describes a response with status code 104, with default header values.
-
-The maximum allowed API amount of monthly API requests has been reached.
-*/
-type GetLatestStatus104 struct {
-	Payload *models.Error
-}
-
-func (o *GetLatestStatus104) Error() string {
-	return fmt.Sprintf("[GET /latest][%d] getLatestStatus104  %+v", 104, o.Payload)
-}
-func (o *GetLatestStatus104) GetPayload() *models.Error {
-	return o.Payload
-}
-
-func (o *GetLatestStatus104) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
-
-	o.Payload = new(models.Error)
-
-	// response payload
-	if err := consumer.Consume(response.Body(), o.Payload); err != nil && err != io.EOF {
-		return err
-	}
-
-	return nil
-}
-
-// NewGetLatestStatus105 creates a GetLatestStatus105 with default headers values
-func NewGetLatestStatus105() *GetLatestStatus105 {
-	return &GetLatestStatus105{}
-}
-
-/* GetLatestStatus105 describes a response with status code 105, with default header values.
-
-The current subscription plan does not support this API endpoint.
-*/
-type GetLatestStatus105 struct {
-	Payload *models.Error
-}
-
-func (o *GetLatestStatus105) Error() string {
-	return fmt.Sprintf("[GET /latest][%d] getLatestStatus105  %+v", 105, o.Payload)
-}
-func (o *GetLatestStatus105) GetPayload() *models.Error {
-	return o.Payload
-}
-
-func (o *GetLatestStatus105) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
-
-	o.Payload = new(models.Error)
-
-	// response payload
-	if err := consumer.Consume(response.Body(), o.Payload); err != nil && err != io.EOF {
-		return err
-	}
-
-	return nil
-}
-
-// NewGetLatestStatus106 creates a GetLatestStatus106 with default headers values
-func NewGetLatestStatus106() *GetLatestStatus106 {
-	return &GetLatestStatus106{}
-}
-
-/* GetLatestStatus106 describes a response with status code 106, with default header values.
-
-The current request did not return any results.
-*/
-type GetLatestStatus106 struct {
-	Payload *models.Error
-}
-
-func (o *GetLatestStatus106) Error() string {
-	return fmt.Sprintf("[GET /latest][%d] getLatestStatus106  %+v", 106, o.Payload)
-}
-func (o *GetLatestStatus106) GetPayload() *models.Error {
-	return o.Payload
-}
-
-func (o *GetLatestStatus106) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
-
-	o.Payload = new(models.Error)
-
-	// response payload
-	if err := consumer.Consume(response.Body(), o.Payload); err != nil && err != io.EOF {
-		return err
-	}
-
-	return nil
 }
 
 // NewGetLatestOK creates a GetLatestOK with default headers values
@@ -324,134 +84,6 @@ func (o *GetLatestOK) readResponse(response runtime.ClientResponse, consumer run
 	return nil
 }
 
-// NewGetLatestCreated creates a GetLatestCreated with default headers values
-func NewGetLatestCreated() *GetLatestCreated {
-	return &GetLatestCreated{}
-}
-
-/* GetLatestCreated describes a response with status code 201, with default header values.
-
-An invalid base currency has been entered.
-*/
-type GetLatestCreated struct {
-	Payload *models.Error
-}
-
-func (o *GetLatestCreated) Error() string {
-	return fmt.Sprintf("[GET /latest][%d] getLatestCreated  %+v", 201, o.Payload)
-}
-func (o *GetLatestCreated) GetPayload() *models.Error {
-	return o.Payload
-}
-
-func (o *GetLatestCreated) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
-
-	o.Payload = new(models.Error)
-
-	// response payload
-	if err := consumer.Consume(response.Body(), o.Payload); err != nil && err != io.EOF {
-		return err
-	}
-
-	return nil
-}
-
-// NewGetLatestAccepted creates a GetLatestAccepted with default headers values
-func NewGetLatestAccepted() *GetLatestAccepted {
-	return &GetLatestAccepted{}
-}
-
-/* GetLatestAccepted describes a response with status code 202, with default header values.
-
-One or more invalid symbols have been specified.
-*/
-type GetLatestAccepted struct {
-	Payload *models.Error
-}
-
-func (o *GetLatestAccepted) Error() string {
-	return fmt.Sprintf("[GET /latest][%d] getLatestAccepted  %+v", 202, o.Payload)
-}
-func (o *GetLatestAccepted) GetPayload() *models.Error {
-	return o.Payload
-}
-
-func (o *GetLatestAccepted) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
-
-	o.Payload = new(models.Error)
-
-	// response payload
-	if err := consumer.Consume(response.Body(), o.Payload); err != nil && err != io.EOF {
-		return err
-	}
-
-	return nil
-}
-
-// NewGetLatestFound creates a GetLatestFound with default headers values
-func NewGetLatestFound() *GetLatestFound {
-	return &GetLatestFound{}
-}
-
-/* GetLatestFound describes a response with status code 302, with default header values.
-
-An invalid date has been specified. [historical, convert]
-*/
-type GetLatestFound struct {
-	Payload *models.Error
-}
-
-func (o *GetLatestFound) Error() string {
-	return fmt.Sprintf("[GET /latest][%d] getLatestFound  %+v", 302, o.Payload)
-}
-func (o *GetLatestFound) GetPayload() *models.Error {
-	return o.Payload
-}
-
-func (o *GetLatestFound) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
-
-	o.Payload = new(models.Error)
-
-	// response payload
-	if err := consumer.Consume(response.Body(), o.Payload); err != nil && err != io.EOF {
-		return err
-	}
-
-	return nil
-}
-
-// NewGetLatestForbidden creates a GetLatestForbidden with default headers values
-func NewGetLatestForbidden() *GetLatestForbidden {
-	return &GetLatestForbidden{}
-}
-
-/* GetLatestForbidden describes a response with status code 403, with default header values.
-
-No or an invalid amount has been specified. [convert]
-*/
-type GetLatestForbidden struct {
-	Payload *models.Error
-}
-
-func (o *GetLatestForbidden) Error() string {
-	return fmt.Sprintf("[GET /latest][%d] getLatestForbidden  %+v", 403, o.Payload)
-}
-func (o *GetLatestForbidden) GetPayload() *models.Error {
-	return o.Payload
-}
-
-func (o *GetLatestForbidden) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
-
-	o.Payload = new(models.Error)
-
-	// response payload
-	if err := consumer.Consume(response.Body(), o.Payload); err != nil && err != io.EOF {
-		return err
-	}
-
-	return nil
-}
-
 // NewGetLatestNotFound creates a GetLatestNotFound with default headers values
 func NewGetLatestNotFound() *GetLatestNotFound {
 	return &GetLatestNotFound{}
@@ -473,6 +105,70 @@ func (o *GetLatestNotFound) GetPayload() *models.Error {
 }
 
 func (o *GetLatestNotFound) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
+
+	o.Payload = new(models.Error)
+
+	// response payload
+	if err := consumer.Consume(response.Body(), o.Payload); err != nil && err != io.EOF {
+		return err
+	}
+
+	return nil
+}
+
+// NewGetLatestTooManyRequests creates a GetLatestTooManyRequests with default headers values
+func NewGetLatestTooManyRequests() *GetLatestTooManyRequests {
+	return &GetLatestTooManyRequests{}
+}
+
+/* GetLatestTooManyRequests describes a response with status code 429, with default header values.
+
+Rate limit
+*/
+type GetLatestTooManyRequests struct {
+	Payload *models.Error
+}
+
+func (o *GetLatestTooManyRequests) Error() string {
+	return fmt.Sprintf("[GET /latest][%d] getLatestTooManyRequests  %+v", 429, o.Payload)
+}
+func (o *GetLatestTooManyRequests) GetPayload() *models.Error {
+	return o.Payload
+}
+
+func (o *GetLatestTooManyRequests) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
+
+	o.Payload = new(models.Error)
+
+	// response payload
+	if err := consumer.Consume(response.Body(), o.Payload); err != nil && err != io.EOF {
+		return err
+	}
+
+	return nil
+}
+
+// NewGetLatestInternalServerError creates a GetLatestInternalServerError with default headers values
+func NewGetLatestInternalServerError() *GetLatestInternalServerError {
+	return &GetLatestInternalServerError{}
+}
+
+/* GetLatestInternalServerError describes a response with status code 500, with default header values.
+
+Internal Server Error
+*/
+type GetLatestInternalServerError struct {
+	Payload *models.Error
+}
+
+func (o *GetLatestInternalServerError) Error() string {
+	return fmt.Sprintf("[GET /latest][%d] getLatestInternalServerError  %+v", 500, o.Payload)
+}
+func (o *GetLatestInternalServerError) GetPayload() *models.Error {
+	return o.Payload
+}
+
+func (o *GetLatestInternalServerError) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
 	o.Payload = new(models.Error)
 
