@@ -117,7 +117,7 @@ func (i *invoices) CreateNewInvoice(workHoursData workinghours.WorkingData) erro
 
 	dateSrv := common.NewDateTool()
 	dayPayment := dateSrv.GetNextLastDayOfMonth()
-	_, lastDayCurrentMonth := dateSrv.GetFirstDayAndLastDayCurrentMonth()
+	firstDayCurrentMonth, lastDayCurrentMonth := dateSrv.GetFirstDayAndLastDayCurrentMonth()
 
 	for _, company := range i.invoicesData.Companies {
 		copiedFile, err := i.driveService.Files.Copy(billingModel.Id, &drive.File{
@@ -147,7 +147,7 @@ func (i *invoices) CreateNewInvoice(workHoursData workinghours.WorkingData) erro
 			"H8":  company.Name,
 			"H9":  company.Address,
 			"B15": workHoursData.TotalHours,
-			"C15": company.Description,
+			"C15": fmt.Sprintf(company.Description, firstDayCurrentMonth.Format(invoiceDateLayout), lastDayCurrentMonth.Format(invoiceDateLayout)),
 			"E15": q,
 		}
 
