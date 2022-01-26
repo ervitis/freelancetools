@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"github.com/ervitis/freelancetools/config"
 	"github.com/ervitis/freelancetools/credentials"
 	"github.com/ervitis/freelancetools/invoices"
 	"github.com/ervitis/freelancetools/workinghours"
@@ -10,6 +11,10 @@ import (
 	"google.golang.org/api/sheets/v4"
 	"log"
 )
+
+func init() {
+	config.LoadConfigApp()
+}
 
 func main() {
 	ctx, cancel := context.WithCancel(context.Background())

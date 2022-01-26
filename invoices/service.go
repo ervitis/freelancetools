@@ -5,7 +5,9 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/ervitis/freelancetools/common"
+	"github.com/ervitis/freelancetools/config"
 	"github.com/ervitis/freelancetools/credentials"
+	"github.com/ervitis/freelancetools/exchangerate"
 	"github.com/ervitis/freelancetools/workinghours"
 	"github.com/ervitis/gotransactions"
 	"google.golang.org/api/drive/v3"
@@ -15,7 +17,7 @@ import (
 	"log"
 	"os"
 	"path/filepath"
-	"time"
+	"strconv"
 )
 
 const (
@@ -29,9 +31,9 @@ type (
 		Name    string `json:"name"`
 		Address string `json:"address"`
 
-		Description string `json:"description"`
-		UnitPrice   int    `json:"unitPrice"`
-		MoneySymbol string `json:"moneySymbol"`
+		Description string  `json:"description"`
+		UnitPrice   float64 `json:"unitPrice"`
+		MoneySymbol string  `json:"moneySymbol"`
 	}
 
 	invoicesData struct {
@@ -41,9 +43,10 @@ type (
 	}
 
 	invoices struct {
-		sheetService *sheets.Service
-		driveService *drive.Service
-		invoicesData invoicesData
+		sheetService        *sheets.Service
+		driveService        *drive.Service
+		invoicesData        invoicesData
+		exchangeRateService *exchangerate.ExchangeApi
 	}
 
 	IInvoices interface {
@@ -75,10 +78,16 @@ func New(ctx context.Context, credManager *credentials.Manager) (IInvoices, erro
 	var d invoicesData
 	_ = json.Unmarshal(b, &d)
 
+	ex, err := exchangerate.NewClient(&config.AppConfig)
+	if err != nil {
+		return nil, fmt.Errorf("creating exchange client: %w", err)
+	}
+
 	return &invoices{
-		sheetService: sheetsService,
-		driveService: driveService,
-		invoicesData: d,
+		sheetService:        sheetsService,
+		driveService:        driveService,
+		invoicesData:        d,
+		exchangeRateService: ex,
 	}, nil
 }
 
@@ -106,35 +115,40 @@ func (i *invoices) CreateNewInvoice(workHoursData workinghours.WorkingData) erro
 
 	billingModel := listBillingModel.Files[0]
 
-	loc, err := time.LoadLocation("Europe/Madrid")
-	if err != nil {
-		return fmt.Errorf("location unkown: %w", err)
-	}
-
-	now := time.Now().In(loc)
-
 	dateSrv := common.NewDateTool()
-	_, lastDate := dateSrv.GetFirstDayAndLastDayCurrentMonth()
+	dayPayment := dateSrv.GetNextLastDayOfMonth()
+	_, lastDayCurrentMonth := dateSrv.GetFirstDayAndLastDayCurrentMonth()
 
 	for _, company := range i.invoicesData.Companies {
 		copiedFile, err := i.driveService.Files.Copy(billingModel.Id, &drive.File{
 			MimeType: "application/vnd.google-apps.spreadsheet",
-			Name:     fmt.Sprintf(i.invoicesData.Name, len(listInvoices.Files)+1, now.Format(invoiceDateLayout), company.Name),
+			Name:     fmt.Sprintf(i.invoicesData.Name, len(listInvoices.Files)+1, lastDayCurrentMonth.Format(invoiceDateLayout), company.Name),
 		}).Do()
 		if err != nil {
 			return fmt.Errorf("copy file from model error: %w", err)
 		}
 
+		cc, err := i.exchangeRateService.
+			ConvertCurrencyLatest(company.MoneySymbol, "EUR", company.UnitPrice)
+		if err != nil {
+			return fmt.Errorf("conversion exchange rate api: %w", err)
+		}
+
 		valueRange := make([]*sheets.ValueRange, 0)
+		q, err := strconv.ParseFloat(fmt.Sprintf("%.2f", cc.Value*company.UnitPrice), 64)
+		if err != nil {
+			log.Println("error parsing float value of price, check it:", err)
+			q = 1.0
+		}
 		row := map[string]interface{}{
 			"H3":  fmt.Sprintf("%d", len(listInvoices.Files)+1),
-			"H4":  now.Format(invoiceDateLayout),
-			"H5":  lastDate.Format(invoiceDateLayout),
+			"H4":  dateSrv.GetNowSpainTime().Format(invoiceDateLayout),
+			"H5":  dayPayment.Format(invoiceDateLayout),
 			"H8":  company.Name,
 			"H9":  company.Address,
 			"B15": workHoursData.TotalHours,
 			"C15": company.Description,
-			"E15": company.UnitPrice,
+			"E15": q,
 		}
 
 		for k, v := range row {
@@ -173,7 +187,6 @@ func (i *invoices) CreateNewInvoice(workHoursData workinghours.WorkingData) erro
 		if err := gotransactions.New(onTransactionCopy, onRollback).ExecuteTransaction(); err != nil {
 			return err
 		}
-
 	}
 
 	return nil

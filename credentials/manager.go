@@ -67,14 +67,14 @@ func (m *Manager) GetClient() *http.Client {
 
 	tok, err := tokenFromFile(pathTokenFile)
 	if err != nil {
-		tok = getTokenFromWeb(m.oauthCfg)
+		tok = m.getTokenFromWeb(m.oauthCfg)
 		saveToken(pathTokenFile, tok)
 	}
 
 	return m.oauthCfg.Client(context.Background(), tok)
 }
 
-func getTokenFromWeb(config *oauth2.Config) *oauth2.Token {
+func (m *Manager) getTokenFromWeb(config *oauth2.Config) *oauth2.Token {
 	authURL := config.AuthCodeURL("state-token", oauth2.AccessTypeOffline)
 	fmt.Printf("Go to the following link in your browser then type the "+
 		"authorization code: \n%v\n", authURL)
