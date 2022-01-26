@@ -14,6 +14,26 @@ Generate swagger client
  swagger generate client
 ```
 
+Create a folder named `env` in the root of the project where you download the API credentials from your Google account console.
+
+Create a file named `invoices.json` inside it that follows this format:
+
+```json
+{
+  "name": "Name of the invoice file without extension",
+  "spreadSheetIdFromCopy": "The spreadsheetId from it copies the model",
+  "companies": [
+    {
+      "name": "Name of the company",
+      "address": "Address of the company",
+      "description": "Description of the job",
+      "unitPrice": "Number of the unit price of the job",
+      "moneySymbol": "Currency ISO symbol"
+    }
+  ]
+}
+```
+
 ## List of features
 
 - Get working hours from Google calendar events
@@ -23,4 +43,3 @@ Generate swagger client
 ## List of TODO
 
 - Better logging
-- Automate get code from google using scrapper if possible
