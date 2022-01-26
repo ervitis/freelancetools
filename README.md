@@ -43,3 +43,4 @@ Create a file named `invoices.json` inside it that follows this format:
 ## List of TODO
 
 - Better logging
+- Personalize better the spreadsheet cells inside the json file
