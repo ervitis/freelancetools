@@ -44,12 +44,11 @@ func (w *workingHours) GetWorkingHoursActualMonth() (*WorkingData, error) {
 	events, err := w.calendar.
 		Events.
 		List("primary").
-		ShowDeleted(true).
+		ShowDeleted(false).
 		SingleEvents(true).
 		Q("Work hours").
-		ShowDeleted(false).
-		TimeMin(firstDayMonth.Format(time.RFC3339)).
-		TimeMax(lastDayMonth.Format(time.RFC3339)).
+		TimeMin(firstDayMonth.AddDate(0, 0, -1).Format(time.RFC3339)).
+		TimeMax(lastDayMonth.AddDate(0, 0, 1).Format(time.RFC3339)).
 		Do()
 	if err != nil {
 		log.Fatalf("Unable to retrieve next ten of the user's events: %v", err)
@@ -71,6 +70,7 @@ func (w *workingHours) GetWorkingHoursActualMonth() (*WorkingData, error) {
 			panic(err)
 		}
 		totalHours += tEnd.Sub(tStart).Hours()
+		fmt.Printf("%v %s - %s -> %.2f\r\n", item.Id, item.Start.DateTime, item.End.DateTime, totalHours)
 	}
 	return &WorkingData{
 		Month:      lastDayMonth.Month().String(),
