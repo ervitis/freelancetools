@@ -131,7 +131,7 @@ func (i *invoices) CreateNewInvoice(workHoursData workinghours.WorkingData) erro
 		cc, err := i.exchangeRateService.
 			ConvertCurrencyLatest(company.MoneySymbol, "EUR", company.UnitPrice)
 		if err != nil {
-			return fmt.Errorf("conversion exchange rate api: %w", err)
+			log.Println("conversion exchange rate api", err)
 		}
 
 		valueRange := make([]*sheets.ValueRange, 0)

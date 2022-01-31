@@ -99,21 +99,24 @@ func (eapi *ExchangeApi) ConvertCurrencyLatest(from string, to string, quantity 
 	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
 	defer cancel()
 
+	cc := &ConvertedCurrency{
+		Currency: to,
+		Value: 1.0,
+	}
+
 	resp, err := eapi.client.Rates.GetLatest(&rates.GetLatestParams{
 		Apikey: eapi.APIKEY, BaseCurrency: &from, Context: ctx,
 	})
 	if err != nil {
-		return nil, fmt.Errorf("convertCurrency: error doing request: %w", err)
+		log.Println("convertCurrency: error doing request:", err)
+	} else {
+		q, ok := resp.GetPayload().Data[to]
+		if !ok {
+			log.Println(fmt.Sprintf("data for currency %s not exists, so you have to put the conversion rate manually", to))
+			q = 1.0
+		}
+		cc.Value = q
 	}
 
-	q, ok := resp.GetPayload().Data[to]
-	if !ok {
-		log.Println(fmt.Sprintf("data for currency %s not exists, so you have to put the conversion rate manually", to))
-		q = 1.0
-	}
-
-	return &ConvertedCurrency{
-		Currency: to,
-		Value:    q,
-	}, nil
+	return cc, nil
 }
