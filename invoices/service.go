@@ -28,17 +28,31 @@ const (
 
 type (
 	companyInvoice struct {
-		Name    string `json:"name"`
-		Address string `json:"address"`
+		Name    cellPairData `json:"name"`
+		Address cellPairData `json:"address"`
 
-		Description string  `json:"description"`
-		UnitPrice   float64 `json:"unitPrice"`
-		MoneySymbol string  `json:"moneySymbol"`
+		Description cellPairData `json:"description"`
+		UnitPrice   float64      `json:"unitPrice"`
+		MoneySymbol string       `json:"moneySymbol"`
+	}
+
+	cellUnitData struct {
+		NumberInvoice string `json:"numberInvoice"`
+		DateInvoice   string `json:"dateInvoice"`
+		DatePayment   string `json:"datePayment"`
+		TotalHours    string `json:"totalHours"`
+		Quantity      string `json:"quantity"`
+	}
+
+	cellPairData struct {
+		Data string `json:"data"`
+		Cell string `json:"cell"`
 	}
 
 	invoicesData struct {
 		Name                  string           `json:"name"`
 		SpreadSheetIDFromCopy string           `json:"spreadSheetIdFromCopy"`
+		CellData              cellUnitData     `json:"cellData"`
 		Companies             []companyInvoice `json:"companies"`
 	}
 
@@ -141,14 +155,14 @@ func (i *invoices) CreateNewInvoice(workHoursData workinghours.WorkingData) erro
 			q = 1.0
 		}
 		row := map[string]interface{}{
-			"H3":  fmt.Sprintf("%d", len(listInvoices.Files)+1),
-			"H4":  dateSrv.GetNowSpainTime().Format(invoiceDateLayout),
-			"H5":  dayPayment.Format(invoiceDateLayout),
-			"H8":  company.Name,
-			"H9":  company.Address,
-			"B15": workHoursData.TotalHours,
-			"C15": fmt.Sprintf(company.Description, firstDayCurrentMonth.Format(invoiceDateLayout), lastDayCurrentMonth.Format(invoiceDateLayout)),
-			"E15": q,
+			i.invoicesData.CellData.NumberInvoice: fmt.Sprintf("%d", len(listInvoices.Files)+1),
+			i.invoicesData.CellData.DateInvoice:   dateSrv.GetNowSpainTime().Format(invoiceDateLayout),
+			i.invoicesData.CellData.DatePayment:   dayPayment.Format(invoiceDateLayout),
+			company.Name.Cell:                     company.Name,
+			company.Address.Cell:                  company.Address,
+			i.invoicesData.CellData.TotalHours:    workHoursData.TotalHours,
+			company.Description.Cell:              fmt.Sprintf(company.Description.Data, firstDayCurrentMonth.Format(invoiceDateLayout), lastDayCurrentMonth.Format(invoiceDateLayout)),
+			i.invoicesData.CellData.Quantity:      q,
 		}
 
 		for k, v := range row {
