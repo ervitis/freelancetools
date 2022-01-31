@@ -3,11 +3,13 @@ package exchangerate
 import (
 	"context"
 	"fmt"
+	"log"
+	"time"
+
 	"github.com/ervitis/freelancetools/config"
 	"github.com/ervitis/freelancetools/exchangerate/client"
 	"github.com/ervitis/freelancetools/exchangerate/client/rates"
 	"github.com/go-openapi/strfmt"
-	"time"
 )
 
 type (
@@ -39,7 +41,7 @@ func NewClient(config *config.AppConfigParameters) (*ExchangeApi, error) {
 	}
 
 	if err := c.getCurrencies(); err != nil {
-		return nil, fmt.Errorf("error creating client: %w", err)
+		log.Println("There was an error trying exchange rate api", err)
 	}
 	return c, nil
 }
@@ -65,6 +67,11 @@ func (eapi *ExchangeApi) getCurrencies() error {
 }
 
 func (eapi *ExchangeApi) validateInput(input string) error {
+	if len(eapi.currencies) == 0 {
+		log.Println("currencies are empty due to api error, so let's skip")
+		return nil
+	}
+
 	if !contains(eapi.currencies, input) {
 		return fmt.Errorf("input data is not valid for currency symbol %s", input)
 	}
@@ -101,7 +108,8 @@ func (eapi *ExchangeApi) ConvertCurrencyLatest(from string, to string, quantity 
 
 	q, ok := resp.GetPayload().Data[to]
 	if !ok {
-		q = 0.0
+		log.Println(fmt.Sprintf("data for currency %s not exists, so you have to put the conversion rate manually", to))
+		q = 1.0
 	}
 
 	return &ConvertedCurrency{
