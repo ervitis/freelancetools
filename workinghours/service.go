@@ -70,7 +70,6 @@ func (w *workingHours) GetWorkingHoursActualMonth() (*WorkingData, error) {
 			panic(err)
 		}
 		totalHours += tEnd.Sub(tStart).Hours()
-		fmt.Printf("%v %s - %s -> %.2f\r\n", item.Id, item.Start.DateTime, item.End.DateTime, totalHours)
 	}
 	return &WorkingData{
 		Month:      lastDayMonth.Month().String(),

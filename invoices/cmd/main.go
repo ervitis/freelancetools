@@ -2,6 +2,8 @@ package main
 
 import (
 	"context"
+	"log"
+
 	"github.com/ervitis/freelancetools/config"
 	"github.com/ervitis/freelancetools/credentials"
 	"github.com/ervitis/freelancetools/invoices"
@@ -9,7 +11,6 @@ import (
 	"google.golang.org/api/calendar/v3"
 	"google.golang.org/api/drive/v3"
 	"google.golang.org/api/sheets/v4"
-	"log"
 )
 
 func init() {
