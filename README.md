@@ -22,13 +22,29 @@ Create a file named `invoices.json` inside it that follows this format:
 {
   "name": "Name of the invoice file without extension",
   "spreadSheetIdFromCopy": "The spreadsheetId from it copies the model",
+  "cellData": {
+    "numberInvoice": "A3",
+    "dateInvoice": "A4",
+    "datePayment": "A5",
+    "totalHours": "D15",
+    "quantity": "E15"
+  },
   "companies": [
     {
-      "name": "Name of the company",
-      "address": "Address of the company",
-      "description": "Description of the job",
-      "unitPrice": "Number of the unit price of the job",
-      "moneySymbol": "Currency ISO symbol"
+      "name": {
+        "data": "name",
+        "cell": "H2"
+      },
+      "address": {
+        "data": "address",
+        "cell": "H3"
+      },
+      "description": {
+        "data": "description, also we can use the %s",
+        "cell": "C5"
+      },
+      "unitPrice": 20000,
+      "moneySymbol": "USD"
     }
   ]
 }
