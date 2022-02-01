@@ -136,7 +136,7 @@ func (i *invoices) CreateNewInvoice(workHoursData workinghours.WorkingData) erro
 	for _, company := range i.invoicesData.Companies {
 		copiedFile, err := i.driveService.Files.Copy(billingModel.Id, &drive.File{
 			MimeType: "application/vnd.google-apps.spreadsheet",
-			Name:     fmt.Sprintf(i.invoicesData.Name, len(listInvoices.Files)+1, lastDayCurrentMonth.Format(invoiceDateLayout), company.Name),
+			Name:     fmt.Sprintf(i.invoicesData.Name, len(listInvoices.Files)+1, lastDayCurrentMonth.Format(invoiceDateLayout), company.Name.Data),
 		}).Do()
 		if err != nil {
 			return fmt.Errorf("copy file from model error: %w", err)
@@ -158,8 +158,8 @@ func (i *invoices) CreateNewInvoice(workHoursData workinghours.WorkingData) erro
 			i.invoicesData.CellData.NumberInvoice: fmt.Sprintf("%d", len(listInvoices.Files)+1),
 			i.invoicesData.CellData.DateInvoice:   dateSrv.GetNowSpainTime().Format(invoiceDateLayout),
 			i.invoicesData.CellData.DatePayment:   dayPayment.Format(invoiceDateLayout),
-			company.Name.Cell:                     company.Name,
-			company.Address.Cell:                  company.Address,
+			company.Name.Cell:                     company.Name.Data,
+			company.Address.Cell:                  company.Address.Data,
 			i.invoicesData.CellData.TotalHours:    workHoursData.TotalHours,
 			company.Description.Cell:              fmt.Sprintf(company.Description.Data, firstDayCurrentMonth.Format(invoiceDateLayout), lastDayCurrentMonth.Format(invoiceDateLayout)),
 			i.invoicesData.CellData.Quantity:      q,

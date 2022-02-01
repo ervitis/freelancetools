@@ -59,7 +59,6 @@ Create a file named `invoices.json` inside it that follows this format:
 ## List of TODO
 
 - Better logging
-- Personalize better the spreadsheet cells inside the json file (test)
 - Personalize using functional pattern to using services, for example the exchange rate converter service
 - Personalize the calendar events
 - Tests and use github workflow
