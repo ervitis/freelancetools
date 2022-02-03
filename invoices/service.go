@@ -4,10 +4,12 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"github.com/ervitis/freelancetools/backup"
 	"github.com/ervitis/freelancetools/common"
 	"github.com/ervitis/freelancetools/config"
 	"github.com/ervitis/freelancetools/credentials"
 	"github.com/ervitis/freelancetools/exchangerate"
+	"github.com/ervitis/freelancetools/model"
 	"github.com/ervitis/freelancetools/workinghours"
 	"github.com/ervitis/gotransactions"
 	"google.golang.org/api/drive/v3"
@@ -27,39 +29,11 @@ const (
 )
 
 type (
-	companyInvoice struct {
-		Name    cellPairData `json:"name"`
-		Address cellPairData `json:"address"`
-
-		Description cellPairData `json:"description"`
-		UnitPrice   float64      `json:"unitPrice"`
-		MoneySymbol string       `json:"moneySymbol"`
-	}
-
-	cellUnitData struct {
-		NumberInvoice string `json:"numberInvoice"`
-		DateInvoice   string `json:"dateInvoice"`
-		DatePayment   string `json:"datePayment"`
-		TotalHours    string `json:"totalHours"`
-		Quantity      string `json:"quantity"`
-	}
-
-	cellPairData struct {
-		Data string `json:"data"`
-		Cell string `json:"cell"`
-	}
-
-	invoicesData struct {
-		Name                  string           `json:"name"`
-		SpreadSheetIDFromCopy string           `json:"spreadSheetIdFromCopy"`
-		CellData              cellUnitData     `json:"cellData"`
-		Companies             []companyInvoice `json:"companies"`
-	}
-
 	invoices struct {
 		sheetService        *sheets.Service
 		driveService        *drive.Service
-		invoicesData        invoicesData
+		backupService       backup.IBackup
+		invoicesData        model.InvoicesData
 		exchangeRateService *exchangerate.ExchangeApi
 	}
 
@@ -79,7 +53,14 @@ func New(ctx context.Context, credManager *credentials.Manager) (IInvoices, erro
 		return nil, fmt.Errorf("creating driveService: %w", err)
 	}
 
-	f, err := os.Open(fmt.Sprintf("env%s%s", string(filepath.Separator), invoicesDataFileName))
+	invPath := fmt.Sprintf("env%s%s", string(filepath.Separator), invoicesDataFileName)
+
+	backupService := backup.New(driveService)
+	if err := backupService.DownloadFileIfNotExists(invPath, config.AppConfig.DriveID); err != nil {
+		return nil, err
+	}
+
+	f, err := os.Open(invPath)
 	if err != nil {
 		return nil, fmt.Errorf("opening file of invoices data: %w", err)
 	}
@@ -89,7 +70,7 @@ func New(ctx context.Context, credManager *credentials.Manager) (IInvoices, erro
 	}()
 
 	b, _ := io.ReadAll(f)
-	var d invoicesData
+	var d model.InvoicesData
 	_ = json.Unmarshal(b, &d)
 
 	ex, err := exchangerate.NewClient(&config.AppConfig)

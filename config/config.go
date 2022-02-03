@@ -8,6 +8,7 @@ import (
 type (
 	AppConfigParameters struct {
 		ExchangeRateApi string
+		DriveID         string
 	}
 )
 
@@ -17,4 +18,5 @@ var (
 
 func LoadConfigApp() {
 	AppConfig.ExchangeRateApi = genv.Key("EXCHANGE_RATE_API").String()
+	AppConfig.DriveID = genv.Key("DRIVE_ID").String()
 }
