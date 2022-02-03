@@ -60,4 +60,3 @@ Create a file named `invoices.json` inside it that follows this format:
 
 - Better logging
 - Tests and use github workflow
-- Save the json files in cloud environment so it can be downloaded
