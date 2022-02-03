@@ -14,9 +14,16 @@ Generate swagger client
  swagger generate client
 ```
 
-Create a folder named `env` in the root of the project where you download the API credentials from your Google account console.
+- Create a file named `.env` and put the two environment variables inside:
 
-Create a file named `invoices.json` inside it that follows this format:
+```bash
+EXCHANGE_RATE_API="API TOKEN FROM openexchangerate"
+DRIVE_ID="DRIVE ID FROM THE URL WHERE THE BACKUP JSON FILE EXISTS"
+```
+
+- Create a folder named `env` in the root of the project where you download the API credentials from your Google account console.
+
+- Create a file named `invoices.json` inside it that follows this format:
 
 ```json
 {
@@ -49,6 +56,8 @@ Create a file named `invoices.json` inside it that follows this format:
   ]
 }
 ```
+
+If no file is found, it can be downloaded from Google Drive from the environment variable `DRIVE_ID`. The file name has to be `invoices.json` name.
 
 ## List of features
 
