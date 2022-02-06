@@ -32,7 +32,6 @@ type (
 	invoices struct {
 		sheetService        *sheets.Service
 		driveService        *drive.Service
-		backupService       backup.IBackup
 		invoicesData        model.InvoicesData
 		exchangeRateService *exchangerate.ExchangeApi
 	}
@@ -56,7 +55,7 @@ func New(ctx context.Context, credManager *credentials.Manager) (IInvoices, erro
 	invPath := fmt.Sprintf("env%s%s", string(filepath.Separator), invoicesDataFileName)
 
 	backupService := backup.New(driveService)
-	if err := backupService.DownloadFileIfNotExists(invPath, config.AppConfig.DriveID); err != nil {
+	if err = backupService.DownloadFileIfNotExists(invPath, config.AppConfig.DriveID); err != nil {
 		return nil, err
 	}
 

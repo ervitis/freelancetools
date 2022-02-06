@@ -154,7 +154,7 @@ func contains(l []string, e string) bool {
 	return false
 }
 
-func (eapi *ExchangeApi) ConvertCurrencyLatest(from string, to string, quantity float64) (*ConvertedCurrency, error) {
+func (eapi *ExchangeApi) ConvertCurrencyLatest(from string, to string) (*ConvertedCurrency, error) {
 	if err := eapi.validateInput(from); err != nil {
 		return nil, fmt.Errorf("convertCurrency: error validating from: %w", err)
 	}
