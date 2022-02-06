@@ -123,7 +123,7 @@ func (i *invoices) CreateNewInvoice(workHoursData workinghours.WorkingData) erro
 		}
 
 		cc, err := i.exchangeRateService.
-			ConvertCurrencyLatest(company.MoneySymbol, "EUR", company.UnitPrice)
+			ConvertCurrencyLatest(company.MoneySymbol, "EUR")
 		if err != nil {
 			log.Println("conversion exchange rate api", err)
 		}

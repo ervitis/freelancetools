@@ -16,7 +16,7 @@ func main() {
 		log.Fatalln(err)
 	}
 
-	data, err := exchangeRateClient.ConvertCurrencyLatest("EUR", "JPY", 3987.0)
+	data, err := exchangeRateClient.ConvertCurrencyLatest("EUR", "JPY")
 	if err != nil {
 		log.Fatalln(err)
 	}
