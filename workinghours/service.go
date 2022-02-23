@@ -47,7 +47,7 @@ func (w *workingHours) GetWorkingHoursActualMonth() (*WorkingData, error) {
 		ShowDeleted(false).
 		SingleEvents(true).
 		Q("Work hours").
-		TimeMin(firstDayMonth.AddDate(0, 0, -1).Format(time.RFC3339)).
+		TimeMin(firstDayMonth.Format(time.RFC3339)).
 		TimeMax(lastDayMonth.AddDate(0, 0, 1).Format(time.RFC3339)).
 		Do()
 	if err != nil {

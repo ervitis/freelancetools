@@ -55,7 +55,7 @@ func New(ctx context.Context, credManager *credentials.Manager) (IInvoices, erro
 	invPath := fmt.Sprintf("env%s%s", string(filepath.Separator), invoicesDataFileName)
 
 	backupService := backup.New(driveService)
-	if err = backupService.DownloadFileIfNotExists(invPath, config.AppConfig.DriveID); err != nil {
+	if err = backupService.DownloadFileIfNotExists(config.AppConfig.DriveID, invoicesDataFileName); err != nil {
 		return nil, err
 	}
 
@@ -101,7 +101,7 @@ func (i *invoices) CreateNewInvoice(workHoursData workinghours.WorkingData) erro
 	}
 
 	listInvoices, err := listFiles.
-		Q(fmt.Sprintf(`"%s" in parents and not name contains "MODELO FACTURA" and trashed = false`, i.invoicesData.SpreadSheetIDFromCopy)).
+		Q(fmt.Sprintf(`"%s" in parents and not name contains "MODELO FACTURA" and not name contains "invoices.json" and trashed = false`, i.invoicesData.SpreadSheetIDFromCopy)).
 		Do()
 	if err != nil {
 		return fmt.Errorf("get list invoices: %w", err)

@@ -69,3 +69,4 @@ If no file is found, it can be downloaded from Google Drive from the environment
 
 - Better logging
 - Tests and use github workflow
+- Retry if auth token has expired
